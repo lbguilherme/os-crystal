@@ -1,0 +1,4 @@
+.crystal
+bc_flags
+main.o
+kernel.elf
