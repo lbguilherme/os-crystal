@@ -21,3 +21,15 @@ clean:
 .PHONY: run
 run: $(MAIN)
 	@$(QEMU) $(QEMUFLAGS) -kernel $(MAIN)
+
+.PHONY: iso
+iso: $(MAIN)
+	@mkdir -p iso/boot/grub
+	@cp $(MAIN) iso/boot/
+	@( \
+		echo "set timeout=0" \
+		echo "menuentry \"crystal kernel\" {" \
+		echo "  multiboot /boot/kernel.elf" \
+		echo "}" \
+	) > iso/boot/grub/grub.cfg
+	@grub2-mkrescue -o kernel.iso iso

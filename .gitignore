@@ -2,3 +2,5 @@
 bc_flags
 main.o
 kernel.elf
+iso
+kernel.iso
