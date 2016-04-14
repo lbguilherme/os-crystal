@@ -1,22 +1,17 @@
 MAIN := kernel.elf
+ISO := kernel.iso
 
-LINK := ld
-LINKFLAGS := -melf_i386
+LINKFLAGS := -nostdlib -m32 -Wl,-T,$(shell pwd)/src/link.ld,--build-id=none
 QEMU := qemu-system-i386
 QEMUFLAGS := -no-reboot -no-shutdown -m 4096
 
-$(MAIN): main.o Makefile src/link.ld
+$(MAIN): $(shell find src | grep .cr) Makefile src/link.ld
 	@echo Creating $@...
-	@$(LINK) $(LINKFLAGS) -T src/link.ld main.o -o $@
-
-main.o: $(shell find src | grep .cr) Makefile
-	@echo Compiling crystal code...
-	@rm -f main.o
-	@crystal build src/main.cr --target=i386 --prelude=empty --cross-compile "kernel" | grep -v rdynamic | cat
+	@crystal build src/main.cr --target=i386 --prelude=empty --link-flags "$(LINKFLAGS)" -o $@
 
 .PHONY: clean
 clean:
-	@rm -rf $(MAIN) main.o
+	@rm -rf $(MAIN) $(ISO) iso
 
 .PHONY: run
 run: $(MAIN)
@@ -29,7 +24,7 @@ iso: $(MAIN)
 	@( \
 		echo "set timeout=0" \
 		echo "menuentry \"crystal kernel\" {" \
-		echo "  multiboot /boot/kernel.elf" \
+		echo "  multiboot /boot/$(MAIN)" \
 		echo "}" \
 	) > iso/boot/grub/grub.cfg
-	@grub2-mkrescue -o kernel.iso iso
+	@grub2-mkrescue -o $(ISO) iso
