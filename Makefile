@@ -17,14 +17,18 @@ clean:
 run: $(MAIN)
 	@$(QEMU) $(QEMUFLAGS) -kernel $(MAIN)
 
+.PHONY: runiso
+runiso: $(iso)
+	@$(QEMU) $(QEMUFLAGS) -cdrom $(ISO)
+
 .PHONY: iso
-iso: $(MAIN)
+iso: $(ISO)
+
+$(ISO): $(MAIN) Makefile
 	@mkdir -p iso/boot/grub
 	@cp $(MAIN) iso/boot/
-	@( \
-		echo "set timeout=0" \
-		echo "menuentry \"crystal kernel\" {" \
-		echo "  multiboot /boot/$(MAIN)" \
-		echo "}" \
-	) > iso/boot/grub/grub.cfg
-	@grub2-mkrescue -o $(ISO) iso
+	@echo "set timeout=0" > iso/boot/grub/grub.cfg
+	@echo "menuentry \"crystal kernel\" {" >> iso/boot/grub/grub.cfg
+	@echo "  multiboot /boot/$(MAIN)" >> iso/boot/grub/grub.cfg
+	@echo "}" >> iso/boot/grub/grub.cfg
+	@grub2-mkrescue iso -o $@
