@@ -11,8 +11,4 @@ struct Pointer(T)
   def []=(offset : Int, data : T)
     (self + offset.to_i64).value = data
   end
-
-  def !
-    address == 0
-  end
 end

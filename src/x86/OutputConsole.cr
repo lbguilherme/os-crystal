@@ -32,7 +32,7 @@ struct OutputConsole
       end
       return
     end
-    @framebuffer[@row * 80 + @col] = ((15u16 << 8) | (0u16 << 12) | byte) as UInt16
+    @framebuffer[@row * 80 + @col] = ((15u16 << 8) | (0u16 << 12) | byte).as UInt16
     @col += 1
     if @col == 80
       @col = 0
